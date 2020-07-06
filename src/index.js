@@ -1,11 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
   ScrollView,
   View,
   Text,
-  StatusBar,
   Button,
   Alert,
   TextInput,
@@ -19,7 +17,9 @@ const App = () => {
   const [url, setUrl] = useState('');
 
   const addRepository = () => {
-    if (url == '' || tech == '' || url == '') {
+    console.log(tech);
+    const myTechs = tech.replace(' ', '').split(',');
+    if (url === '' || myTechs.length === 0 || url === '') {
       Alert.alert(
         'You have to fill in all fields.',
         'If you want to add a new Repository set title, tech and url!',
@@ -29,10 +29,10 @@ const App = () => {
         .post('/repositories', {
           title,
           url,
-          techs: [tech],
+          techs: myTechs,
         })
         .then(response => {
-          if (response.status != 200) {
+          if (response.status !== 200) {
             Alert.alert(
               `Something went wrong. The response status is ${response.status}`,
             );
@@ -48,13 +48,13 @@ const App = () => {
 
   const addALike = id => {
     api.post(`repositories/${id}/like`).then(response => {
-      if (response.status != 200) {
+      if (response.status !== 200) {
         Alert.alert(
           `Something went wrong. The response status is ${response.status}`,
         );
       } else {
         const newArray = items.map(item =>
-          item.id == id ? {...item, likes: item.likes + 1} : item,
+          item.id === id ? {...item, likes: item.likes + 1} : item,
         );
         setItems(newArray);
       }
@@ -63,13 +63,13 @@ const App = () => {
 
   const deleteItem = id => {
     api.delete(`repositories/${id}`).then(response => {
-      if (response.status != 204) {
+      if (response.status !== 204) {
         Alert.alert(
           `Something went wrong. The response status is ${response.status}`,
         );
       } else {
         const newArray = [];
-        items.map(item => (item.id == id ? null : newArray.push(item)));
+        items.map(item => (item.id === id ? null : newArray.push(item)));
         setItems(newArray);
       }
     });
@@ -86,26 +86,22 @@ const App = () => {
         {items.map(item => {
           return (
             <View key={item.id} style={styles.item}>
-              <Text style={{color: 'yellow', fontSize: 20}}>
-                Title: {item.title}
+              <Text style={styles.itemTitle}>Title: {item.title}</Text>
+              <Text style={styles.itemText}>
+                techs: {item.techs.reduce((total, next) => `${total}, ${next}`)}
               </Text>
-              <Text style={{color: 'white', fontSize: 16}}>
-                techs: {item.techs}
-              </Text>
-              <Text style={{color: 'white', fontSize: 16}}>
-                likes: {item.likes}
-              </Text>
+              <Text style={styles.itemText}>likes: {item.likes}</Text>
               <View
                 style={{
                   flexDirection: 'row',
                 }}>
-                <View style={{margin: 5, flex: 1}}>
+                <View style={styles.buttonContainer}>
                   <Button
                     title="add a like"
                     onPress={() => addALike(item.id)}
                   />
                 </View>
-                <View style={{margin: 5, flex: 1}}>
+                <View style={styles.buttonContainer}>
                   <Button
                     color="red"
                     title="delete"
@@ -121,53 +117,19 @@ const App = () => {
         <View
           style={{
             flexDirection: 'row',
-            alignItems: 'center',
           }}>
-          <Text
-            style={{
-              alignSelf: 'center',
-
-              fontSize: 20,
-              height: 35,
-              backgroundColor: 'blue',
-              color: 'yellow',
-            }}>
-            Title:{'  '}
-          </Text>
+          <Text style={styles.inputTitle}>Title:</Text>
           <TextInput
-            style={{
-              flex: 1,
-              height: 40,
-              borderColor: 'gray',
-              borderWidth: 1,
-              fontSize: 16,
-              backgroundColor: 'white',
-            }}
+            style={styles.textInput}
             onChangeText={text => setTitle(text)}
             value={title}
             placeholder="set a title"
           />
         </View>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Text
-            style={{
-              alignSelf: 'center',
-              fontSize: 20,
-              height: 35,
-              backgroundColor: 'blue',
-              color: 'yellow',
-            }}>
-            tech:{'  '}
-          </Text>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={styles.inputTitle}>tech:</Text>
           <TextInput
-            style={{
-              flex: 1,
-              height: 40,
-              borderColor: 'gray',
-              borderWidth: 1,
-              fontSize: 16,
-              backgroundColor: 'white',
-            }}
+            style={styles.textInput}
             onChangeText={text => setTech(text)}
             value={tech}
             placeholder="set a tech"
@@ -175,26 +137,10 @@ const App = () => {
         </View>
       </View>
 
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <Text
-          style={{
-            alignSelf: 'center',
-            fontSize: 20,
-            height: 35,
-            backgroundColor: 'blue',
-            color: 'yellow',
-          }}>
-          url:{'  '}
-        </Text>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={styles.inputTitle}>url:</Text>
         <TextInput
-          style={{
-            flex: 1,
-            height: 40,
-            borderColor: 'gray',
-            borderWidth: 1,
-            fontSize: 16,
-            backgroundColor: 'white',
-          }}
+          style={styles.textInput}
           onChangeText={text => setUrl(text)}
           value={url}
           placeholder="set a url"
@@ -207,6 +153,28 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
+  itemTitle: {color: 'yellow', fontSize: 20},
+  itemText: {color: 'white', fontSize: 16},
+  inputTitle: {
+    alignItems: 'center',
+    flex: 1,
+    fontSize: 20,
+    height: 35,
+    backgroundColor: 'blue',
+    color: 'yellow',
+  },
+  buttonContainer: {
+    margin: 5,
+    flex: 1,
+  },
+  textInput: {
+    flex: 4,
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    fontSize: 16,
+    backgroundColor: 'white',
+  },
   button: {
     justifyContent: 'flex-end',
   },
