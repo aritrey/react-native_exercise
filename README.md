@@ -1,11 +1,7 @@
 # React Native - Exercise
- mobile frontend for ROCKETSEAT exercises 
+ 
+RocketSeat BootCamp - mobile frontend for ROCKETSEAT Exercises 
 
-
-
-# React Native - Exercise
-
-RocketSeat BootCamp - React Native Exercise 
 
 ## Features
 
