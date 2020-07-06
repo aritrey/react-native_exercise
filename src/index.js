@@ -47,9 +47,7 @@ const App = () => {
   };
 
   const addALike = id => {
-    console.log(id);
     api.post(`repositories/${id}/like`).then(response => {
-      console.log(response.data);
       if (response.status != 200) {
         Alert.alert(
           `Something went wrong. The response status is ${response.status}`,
